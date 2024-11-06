@@ -8,7 +8,7 @@ import router from './Routes/Routes.jsx';
 import AuthProvider from './pages/AuthProvider/AuthProvider.jsx';
 
 createRoot(document.getElementById('root')).render(
-  <div className='max-w-7xl mx-auto'>
+  <div className='flex flex-col min-h-screen max-w-6xl mx-auto'>
     <StrictMode>
       <AuthProvider>
         <RouterProvider router={router} />

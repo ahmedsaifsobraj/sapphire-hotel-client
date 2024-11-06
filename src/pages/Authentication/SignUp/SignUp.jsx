@@ -1,28 +1,98 @@
 import { useContext } from 'react';
 import { AuthContext } from '../../AuthProvider/AuthProvider';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faGoogle } from '@fortawesome/free-brands-svg-icons';
+import Swal from 'sweetalert2';
 
 const SignUp = () => {
-    const {createUser}=useContext(AuthContext);
-    const handleSignUp = e=>{
+    const nav = useNavigate();
+    const { createUser, signInWithGoogle } = useContext(AuthContext);
+    const handleGoogleSignIn = () => {
+        signInWithGoogle()
+        .then((res) => res.json())
+        .then((data) => {
+            if (data.success) {
+                console.log('User successfully logged in');
+                Swal.fire({
+                    title: "Success",
+                    text: "You have successfully logged in",
+                    icon: "success",
+                });
+                nav('/');
+            }
+        })
+        .catch((error) => {
+            console.log(error);
+            Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "Something went wrong!",
+            });
+        });
+    }
+    const handleSignUp = e => {
         e.preventDefault();
         const form = e.target;
         const email = form.email.value;
         const password = form.password.value;
-        console.log(email,password);
-        createUser(email,password);
+        console.log(email, password);
+        createUser(email, password)
+        .then(res => {
+            console.log("User successfully created");
+            const user = { email };
+            console.log(user);
+            // Once Firebase sign-in is successful, call the backend to generate JWT
+            fetch("https://sapphire-hotel-server.vercel.app/jwt", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(user),
+            })
+            .then(res => res.json())  // Parse the response as JSON
+            .then(data => {
+              console.log(data);
+                    if (data.success === true) {
+                        console.log("JWT token generated successfully");
+                        form.reset();
+                        Swal.fire({
+                            title: "Success",
+                            text: "Your Account has been created",
+                            icon: "success",
+                        });
+                        nav("/");
+                    } else {
+                        Swal.fire({
+                            title: "Error",
+                            text: "Something went wrong while generating JWT.",
+                            icon: "error",
+                        });
+                    }
+                })
+                .catch((error) => {
+                    console.log(error);
+                    Swal.fire({
+                        title: "Oops...",
+                        text: "Error generating JWT token.",
+                        icon: "error",
+                    });
+                });
+        })
+        .catch((error) => {
+            console.error("SignUp error:", error);
+            Swal.fire({
+                title: "Error",
+                text: "Invalid email or password",
+                icon: "error",
+            });
+        });
     }
     return (
-        <div className="hero bg-base-200 min-h-screen">
+        <div className="hero bg-base-100 min-h-screen">
             <div className="hero-content flex-col lg:flex-row-reverse">
-                <div className="text-center lg:text-left">
-                    <h1 className="text-5xl font-bold">Register now!</h1>
-                    <p className="py-6">
-                        Provident cupiditate voluptatem et in. Quaerat fugiat ut assumenda excepturi exercitationem
-                        quasi. In deleniti eaque aut repudiandae et a id nisi.
-                    </p>
-                </div>
-                <div className="card bg-base-100 w-full max-w-sm shrink-0 shadow-2xl">
+                <div className="card bg-base-300 w-full max-w-sm shrink-0 shadow-2xl">
+                    <h1 className="text-3xl text-center font-bold mt-8">Sign up</h1>
                     <form onSubmit={handleSignUp} className="card-body">
                         <div className="form-control">
                             <label className="label">
@@ -40,12 +110,20 @@ const SignUp = () => {
                             </label>
                         </div>
                         <div className="form-control mt-6">
-                            <input className='btn btn-primary' type="submit" value="SignUp" />
+                            <input className='btn bg-yellow-600 text-white text-lg' type="submit" value="Create Account" />
                         </div>
-                        <p className='text-center text-sm mt-6'>Already a user? <Link to='/signin'>Login Here</Link></p>
+                        <div className="divider">Or sign in with</div>
+                        <div className="form-control mt-6">
+                            <button onClick={handleGoogleSignIn} className='btn bg-yellow-600 text-white'><FontAwesomeIcon icon={faGoogle} /> Google</button>
+                        </div>
+                        <p className='text-center text-sm mt-6'>Already a user? <Link className='text-yellow-600' to='/signin'>Login Here</Link></p>
                     </form>
                 </div>
+                <div className="text-center lg:text-left">
+                    <img className='hidden md:block rounded-lg w-full' src='https://i.ibb.co.com/VLdx6MH/204.jpg' alt="" />
+                </div>
             </div>
+            
         </div>
     );
 }

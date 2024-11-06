@@ -4,7 +4,7 @@ import FeatureRoom from "../FeatureRoom/FeatureRoom";
 const FeaturedRooms = () => {
     const [rooms, setRooms]=useState([]);
     useEffect(()=>{
-        fetch("http://localhost:5000/featuredrooms",{
+        fetch("https://sapphire-hotel-server.vercel.app/featuredrooms",{
             method:'GET',
             headers:{
                 'content-type':'application/json'
@@ -15,7 +15,7 @@ const FeaturedRooms = () => {
     },[])
     return (
         <div>
-            <h1 className="text-3xl md:text-5xl my-8 text-yellow-600">Rooms & Suites</h1>
+            <h1 className="text-2xl md:text-5xl my-8 text-yellow-600 text-center">Rooms & Suites</h1>
           
             <div className="carousel w-full">
                 {
