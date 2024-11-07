@@ -12,6 +12,7 @@ const Footer = () => {
                     Sapphire Holdings Ltd.
                     <br />
                     Providing reliable facilities since 1992
+                    ©Ahmed Saif Sobraj 2024
                 </p>
             </aside>
             <nav>
